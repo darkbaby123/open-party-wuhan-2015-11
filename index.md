@@ -14,8 +14,7 @@
 
 # Hybrid App
 
-- 混合应用
-- 混合 native 和 web 技术开发移动端应用
+混合 web 和 native 技术开发的移动端应用
 
 ----
 
@@ -39,14 +38,14 @@
 
 - 框架结构是 native 代码，比如 navigation
 - 在需要的部分嵌入 webview 做界面
-- 往往有多个 webview
+- 可能有多个 webview
 - [Basecamp 是其中代表](https://signalvnoise.com/posts/3743-hybrid-sweet-spot-native-navigation-web-content)
 
 ----
 
 ## Bigger 图
 
-![web-hybrid-vs-native-hybrid](/web-hybrid-vs-native-hybrid.png)
+![web-hybrid-vs-native-hybrid](/img/web-hybrid-vs-native-hybrid.png)
 
 ----
 
@@ -94,7 +93,7 @@
 
 ## 例子
 
-![ionic-hello-world](/ionic-hello-world.png)
+![ionic-hello-world](/img/ionic-hello-world.png)
 
 ---
 
@@ -108,22 +107,22 @@
 
 ## Ionic 默认给你的
 
-![ionic-app-structure](/ionic-app-structure.png)
+![ionic-app-structure](/img/ionic-app-structure.png)
 
 ----
 
-![you-tm](/you-tm-2.jpg)
+![you-tm](/img/you-tm.jpg)
 
 ----
 
 ## Ionic 项目结构 === Angular 项目结构
 
-- [Angular Style Guide](https://github.com/johnpapa/angular-styleguide)
-- 针对 ES2015 做一点改变
-
 ----
 
-## 我们用的项目结构
+## 我们用的
+
+- [Angular Style Guide](https://github.com/johnpapa/angular-styleguide)
+- 针对 ES2015 做一点改变
 
 ```
 app/
@@ -252,7 +251,7 @@ gulp.task('sass', function() {
 
 ----
 
-## 项目结构
+## 源码 & 编译后代码
 
 ```
 app/
@@ -339,7 +338,7 @@ gulp.task('js', function() {
 
 - 使用 ENV 环境变量 (dev, staging, prod) 设定环境
 - 环境配置写在 JSON 文件里面
-- 使用 gulp-ng-config 编译成 Angular module 和 service
+- 使用 gulp-ng-config 编译成 Angular module 和 constant
 - 用 Angular 的 DI 注入任何需要的模块中使用
 
 ----
@@ -352,12 +351,12 @@ gulp.task('js', function() {
     "appConfig": {
       "apiHost": ""
     }
-  }
+  },
   "staging": {
     "appConfig": {
       "apiHost": "http://staging.yourapp.com"
     }
-  }
+  },
   "prod": {
     "appConfig": {
       "apiHost": "https://api.yourapp.com"
@@ -416,7 +415,7 @@ angular.module('app')
 
 ## 平时开发，在浏览器上调试
 
-![dev-on-chrome](/dev-on-chrome.png)
+![dev-on-chrome](/img/dev-on-chrome.png)
 
 ----
 
@@ -427,7 +426,7 @@ angular.module('app')
 
 ----
 
-![chrome-emulate](/chrome-emulate.png)
+![chrome-emulate](/img/chrome-emulate.png)
 
 ----
 
@@ -458,17 +457,17 @@ ionic run ios
 
 ## 在 Android 上调试
 
-![android-debug](/android-debug.png)
+![android-debug](/img/android-debug.png)
 
 ----
 
 ## 在 iOS 上调试
 
-![ios-debug](/ios-debug.png)
+![ios-debug](/img/ios-debug.png)
 
 ----
 
-## Live Reload
+## 在设备上 Live Reload
 
 ```bash
 # 有时有点小问题，不过基本能用
@@ -718,6 +717,7 @@ $scope 里找不到 form 了？
   - Cordova 是提供设备功能到 JS 接口的 adapter
   - Ionic 是 UI 层
   - Angular 提供架构
+  - Gulp 提供 build 流程
 - Web 开发的所有工具和技巧几乎都能用
 - 对 Web 开发者比较容易上手，但需要各方面的综合能力
 
