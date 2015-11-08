@@ -1,19 +1,21 @@
-# Ionic 的最佳实践
+# Impressive Ionic for Hybrid App
 
 ---
 
 # 关于我
 
-- 陈璋
+- 陈璋 (David Chen)
 - 7 年全栈（gan）工程师
-- 擅长 Ruby/JavaScript
+- 擅长前端 (JavaScript) 的后端 (Ruby)
+- 为 Ember.js 做过一点小贡献
+- [Blog](http://segmentfault.com/u/darkbaby123)
 
 ---
 
 # Hybrid App
 
 - 混合应用
-- 用 web 技术开发移动端 app
+- 混合 native 和 web 技术开发移动端应用
 
 ----
 
@@ -29,7 +31,7 @@
 - 主体代码都用 Web 技术，几乎没有 native UI 组件
 - 一个 webview 为主体，跑 web 代码
 - 一层 native container，负责与硬件交互
-- Cordova/PhoneGap 是其中代表
+- [Ionic 是其中代表](http://ionicframework.com/)
 
 ----
 
@@ -38,12 +40,23 @@
 - 框架结构是 native 代码，比如 navigation
 - 在需要的部分嵌入 webview 做界面
 - 往往有多个 webview
+- [Basecamp 是其中代表](https://signalvnoise.com/posts/3743-hybrid-sweet-spot-native-navigation-web-content)
 
 ----
 
 ## Bigger 图
 
 ![web-hybrid-vs-native-hybrid](/web-hybrid-vs-native-hybrid.png)
+
+----
+
+## The 3rd way
+
+用相同的代码开发，编译成不同平台的 native 代码
+
+- React Native
+- Telerik (Kendo UI, NativeScript)
+- Xamarin (.NET)
 
 ---
 
@@ -106,7 +119,7 @@
 ## Ionic 项目结构 === Angular 项目结构
 
 - [Angular Style Guide](https://github.com/johnpapa/angular-styleguide)
-- 针对 ES6 做一点改变
+- 针对 ES2015 做一点改变
 
 ----
 
@@ -123,7 +136,6 @@ app/
     func-2.controller.js    <- 子功能 2 相关
     ...
   mod-2/
-    mod-2.module.js
     ...
 ```
 
@@ -157,7 +169,7 @@ class Func1Service {
   }
 }
 
-angular.module('app.mod-1').controller('func1Service', Func1Service)
+angular.module('app.mod-1').service('func1Service', Func1Service)
 
 })()
 ```
@@ -176,7 +188,7 @@ angular.module('app.mod-1').controller('func1Service', Func1Service)
 
 ----
 
-## Bad
+## 原始的方法
 
 ```html
 <!--
@@ -325,13 +337,14 @@ gulp.task('js', function() {
 
 ## 解法
 
-- 使用 ENV 环境变量 (dev, staging, prod)
-- 使用 gulp-ng-config 编译成 Angular module
-- 最后用 Gulp 合并加载
+- 使用 ENV 环境变量 (dev, staging, prod) 设定环境
+- 环境配置写在 JSON 文件里面
+- 使用 gulp-ng-config 编译成 Angular module 和 service
+- 用 Angular 的 DI 注入任何需要的模块中使用
 
 ----
 
-## app-config.js
+## app-config.json
 
 ```js
 {
@@ -379,6 +392,20 @@ gulp.task('app-config', function() {
 ENV=staging gulp build
 
 ENV=prod ionic serve    <- 使用 ENV 的好处，不影响 Ionic CLI
+```
+
+## 编译后的 module
+
+```js
+// compiled config (www/app-config.js)
+angular.module('app')
+  .constant('appConfig', {
+    apiHost: 'http://staging.yourapp.com'
+  })
+
+// use appConfig in other services
+angular.module('app')
+  .service('apiService', function(appConfig) => { .. })
 ```
 
 ---
@@ -445,7 +472,7 @@ ionic run ios
 
 ```bash
 # 有时有点小问题，不过基本能用
-ionic run --livereload
+ionic run ios --livereload
 ```
 
 ---
@@ -454,42 +481,69 @@ ionic run --livereload
 
 ---
 
-## Build 之前清理临时文件
-
-- Gulp 的设计目标是尽量并行地执行任务
-- 我们有时需要按顺序执行任务
-- clean 就是一个典型例子
+# Build 之前清理临时文件
 
 ----
 
-## 解决方法：run-sequence
+## 问题
+
+- Gulp 的设计目标是尽量并行地执行任务
+- Gulp API 不能很好地表达需要按顺序执行的任务
+- clean 就是一个典型例子（先 clean 再 build），因此不太好做
+
+----
+
+## 解决方法
+
+用 run-sequence 指定 task 顺序
 
 ```js
+// npm install run-sequence
+
+var runSequence = require('run-sequence')
+
 gulp.task('build', function(done) {
   runSequence(
     'clean',
     ['js-polyfill', 'js', 'app-config', 'template', 'sass'],
-    done    // 注意要加 done，告诉 Gulp 任务何时完成
+    done    // 调用 done callback，告诉 Gulp 任务何时完成
   )
 })
 ```
 
 ---
 
-## 缓存 Angular 模板
-
-- Angular 通过 AJAX 加载指定了 url 的模板 (templateUrl, ng-include)
-- 如果等进入页面时才加载模板，就会影响页面展现速度
-- Ionic 为了速度，会在项目启动时加载 20 个模板
-- 每次 `ionic serve` 就是 20 个请求，拖慢开发速度
-- 配合 Live reload 就是神一般的体验
+# 模板预加载
 
 ----
 
-## 解决方法：gulp-angular-templatecache
+## 现象
+
+- Ionic 会预加载定义在 route ($stateProvider.state) 里的模板
+- 默认预加载 30 个
+- 提升页面渲染性能
+
+----
+
+## 问题
+
+- 对开发太不友好
+- 页面一刷新就是 30 个 AJAX 请求
+- 配合 Live Reload 就是神一般的体验
+
+----
+
+## 解决方法
+
+用 gulp-angular-templatecache 预编译所有模板
 
 ```js
+var paths = {
+  template: ['./app/**/*.html'],
+}
+
 // 预编译模板成 JavaScript，放到 app.templates 模块下
+// build 时调用这个任务
 gulp.task('template', function() {
   return gulp.src(paths.template)
     .pipe(templateCache({
@@ -502,74 +556,173 @@ gulp.task('template', function() {
 
 ---
 
-## Ionic view cache
+# Ionic view cache
 
-- 设计目的是为了提升 UI 性能
+----
+
+## 现象
+
+- Ionic 会缓存 view (DOM cache) 来提升 UI 性能
+- view 默认缓存 10 个
 - 对 back 的动画效果尤其有用
-- 改变了 scope 的生命周期
-- [ion-view Doc](http://ionicframework.com/docs/api/directive/ionView/)
+- [ion-view 的 caching](http://ionicframework.com/docs/api/directive/ionView/)
+- [$ionicConfigProvider 的 maxCache 和 forwardCache](http://ionicframework.com/docs/api/provider/$ionicConfigProvider/)
 
 ----
 
-## 影响
+## 问题
 
-- controller 的构造函数往往只执行一次
-- directive 的 link 函数往往也只执行一次
+- scope 的生命周期改变了
+- controller 的构造函数不会每次都执行了
+- directive 的 link 函数也不会每次都执行了
 
 ----
 
+## 解决方法：controller
 
+多用 $ionicView 事件
 
+```js
+class SomeController {
+  constructor($scope) {
+    // 当 view 重新构造时才执行，缓存后就不执行了
 
-- View cache (controller constructor, directive link)
-- Crosswalk on Android
-- form under directive
+    $scope.$on('$ionicView.beforeEnter', () => {
+      // 每次进入 view 的时候都会执行
+    })
 
+    $scope.$on('$ionicView.beforeLeave', () => {
+      // 每次离开 view 的时候都会执行
+    })
+  }
+}
+```
 
+----
 
+## 解决方法：controller
 
+多用 getter 或 $watch
 
+```js
+class SomeController {
+  constructor($scope, user) {
+    this.user = user
 
+    // 不推荐
+    this.fullName = `${this.user.firstName} ${this.user.lastName}`
 
+    // 推荐 (watch)
+    $scope.$watchGroup(['vim.user.firstName', 'vm.user.lastName'], () => {
+      this.fullName = `${this.user.firstName} ${this.user.lastName}`
+    })
+  }
 
+  // 大力推荐 (getter)
+  get fullName() {
+    return `${this.user.firstName} ${this.user.lastName}`
+  }
+}
+```
 
-## Build process
+----
 
-separate environment
-use Browsersync instead of LiveReload
+## 解决方法：directive
 
-## Replace ionic serve with gulp task
+- $ionicView 事件对 directive 不起作用
+- 难以使用 `xxx as`，所以没法用 getter
+- 尽量用 $watch
 
-- full control, more flexible
-- prevent `ionic serve` error
+---
 
-# Hole
+## Webview
 
-- View cache (controller constructor, directive link)
-- form under directive
+----
 
-# Improve
+## 问题
 
-## Use Webpack
+- 不同平台下的 webview 有差异 (iOS, Android)
+- 同平台不同版本的 webview 也有差异 (iOS 7/8/9, Android 2/4/5)
+- 同平台同版本，浏览器和 webview 也有差异
 
-# 技巧
+----
 
-- angular template cache
-- gulp run sequence
+## 解决方法
+
+- iOS 平台其实差异不算太大（不管了）
+- Android 平台可以替换成统一的 webview
+- 推荐 [Crosswalk](https://crosswalk-project.org/documentation/cordova/cordova_4.html)
+- 需要 Cordova 版本 4.0 以上
+
+---
+
+# Form
+
+----
+
+## 问题
+
+$scope 里找不到 form 了？
+
+```html
+<ion-view>
+  <ion-content>
+    <!-- in controller: $scope.myForm is undefined -->
+    <form name="myForm"></form>
+  </ion-content>
+</ion-view>
+```
+
+----
+
+## Angular 的 $scope 设计问题
+
+- ion-content 是 directive
+- directive 包裹的 html 背后是 transcluded scope ，原型继承自外层的 scope (controller)
+- `<form name="myForm">` 其实把 form 附在 transcluded scope 上
+
+```html
+<!-- controller scope -->
+<ion-view>
+  <ion-content><!-- directive -->
+    <!-- transcluded scope -->
+    <form name="myForm"></form>
+  </ion-content>
+</ion-view>
+```
+
+----
+
+## 解决方法
+
+- [Angular: understanding scope](https://github.com/angular/angular.js/wiki/Understanding-Scopes)
+- 始终使用 `scope.someObj.attr = ..`
+- 有了 `controller as` ，controller 就是 `scope.someObj`
+
+```html
+<!-- in route: controller as vm -->
+<ion-view>
+  <ion-content>
+    <!-- scope: transcluded scope -->
+    <!-- scope.vm: parent scope's controller instance -->
+    <form name="vm.myForm"></form>
+  </ion-content>
+</ion-view>
+```
+
+---
 
 # Hybrid app 感想
 
-混合不同方面的技能去完成一件事情
-容易上手，但不一定简单
+- 混合不同方面的技能去完成一件事情
+  - Cordova 是提供设备功能到 JS 接口的 adapter
+  - Ionic 是 UI 层
+  - Angular 提供架构
+- Web 开发的所有工具和技巧几乎都能用
+- 对 Web 开发者比较容易上手，但需要各方面的综合能力
 
+---
 
-http://docs.phonegap.com/develop/1-embed-webview/ios/
-http://phonegap.com/blog/2015/03/12/mobile-choices-post1/
+# Thanks!
 
-
-## Gulp
-
-Write your own gulp tasks, remember to tell other tasks you're done:
-- execute the callback.
-- return a promise.
-- return a stream.
+## Q & A

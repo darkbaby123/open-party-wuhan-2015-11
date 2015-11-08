@@ -15,3 +15,8 @@ npm install -g reveal-md
 # 在 repo 根目录下执行，这会启动一个 Node 服务器，浏览器页面会自动打开
 reveal-md .
 ```
+
+# TODO
+
+- 加上 Cordova 项目结构
+- 一个真实的 Ionic app 的例子
