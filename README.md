@@ -1,4 +1,4 @@
-# impressive Ionic for Hybrid App
+# Impressive Ionic for Hybrid App
 
 Open Party Wuhan 2015-11 的演讲, 使用 Markdown 和 Reveal.js 制作
 
