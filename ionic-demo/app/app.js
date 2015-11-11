@@ -2,8 +2,11 @@
 
 defineApp('app', [
   ['app.core', ['ionic']],
+  'app.templates', // Store cached templates in this module
   'app.auth',
-]).run($ionicPlatform => {
+]).config($urlRouterProvider => {
+  $urlRouterProvider.otherwise('/login')
+}).run($ionicPlatform => {
   $ionicPlatform.ready(() => {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)

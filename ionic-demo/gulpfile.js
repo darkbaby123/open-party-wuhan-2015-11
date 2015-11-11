@@ -8,14 +8,16 @@ var rename = require('gulp-rename')
 var sh = require('shelljs')
 var babel = require('gulp-babel')
 var sourcemaps = require('gulp-sourcemaps')
+var templateCache = require('gulp-angular-templatecache')
 
 var paths = {
   js: ['./app/**/*.js'],
   sass: ['./scss/**/*.scss'],
+  template: ['./app/**/*.html'],
   compiled: './www/compiled/',
 }
 
-gulp.task('default', ['js', 'sass'])
+gulp.task('default', ['js', 'sass', 'template'])
 
 gulp.task('js', function() {
   return gulp.src(paths.js)
@@ -41,9 +43,19 @@ gulp.task('sass', function() {
     .pipe(gulp.dest(paths.compiled))
 })
 
+gulp.task('template', function() {
+  return gulp.src(paths.template)
+    .pipe(templateCache({
+      root: 'app',
+      module: 'app.templates',
+    }))
+    .pipe(gulp.dest(paths.compiled))
+})
+
 gulp.task('watch', function() {
   gulp.watch(paths.js, ['js'])
   gulp.watch(paths.sass, ['sass'])
+  gulp.watch(paths.template, ['template'])
 })
 
 gulp.task('install', ['git-check'], function() {

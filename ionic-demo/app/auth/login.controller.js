@@ -1,11 +1,23 @@
 (() => {
 
 class LoginController {
-  constructor($scope) {
-    this.$scope = $scope
+  constructor($scope, $ionicPopup) {
+    this.$ionicPopup = $ionicPopup
+
+    $scope.$on('$ionicView.beforeEnter', () => {
+      this.username = ''
+      this.password = ''
+    })
   }
 
   login() {
+    this.$ionicPopup.alert({
+      title: 'Login success',
+      template: `
+        <div>username: ${this.username}</div>
+        <div>password: ${this.password}</div>
+      `,
+    })
   }
 }
 

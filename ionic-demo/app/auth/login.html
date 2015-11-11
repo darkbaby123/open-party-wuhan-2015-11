@@ -1,5 +1,19 @@
 <ion-view view-title="Login">
   <ion-content>
-    Hello!
+    <form name="vm.form" novalidate ng-submit="vm.form.$valid && vm.login()">
+      <div class="list">
+        <label class="item item-input">
+          <span class="input-label">Username</span>
+          <input type="text" ng-model="vm.username" required>
+        </label>
+        <label class="item item-input">
+          <span class="input-label">Password</span>
+          <input type="password" ng-model="vm.password" required>
+        </label>
+      </div>
+      <div class="padding">
+        <button class="button button-block button-positive">Login</button>
+      </div>
+    </form>
   </ion-content>
 </ion-view>
