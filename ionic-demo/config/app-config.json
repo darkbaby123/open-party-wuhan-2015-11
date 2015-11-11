@@ -1,0 +1,19 @@
+{
+  "dev": {
+    "appConfig": {
+      "apiHost": "http://dev.app.com"
+    }
+  },
+
+  "staging": {
+    "appConfig": {
+      "apiHost": "http://staging.app.com"
+    }
+  },
+
+  "prod": {
+    "appConfig": {
+      "apiHost": "http://api.app.com"
+    }
+  }
+}

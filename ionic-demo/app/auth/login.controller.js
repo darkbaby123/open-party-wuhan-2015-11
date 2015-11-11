@@ -1,8 +1,9 @@
 (() => {
 
 class LoginController {
-  constructor($scope, $ionicPopup) {
+  constructor($scope, $ionicPopup, appConfig) {
     this.$ionicPopup = $ionicPopup
+    this.appConfig = appConfig
 
     $scope.$on('$ionicView.beforeEnter', () => {
       this.username = ''
@@ -14,6 +15,7 @@ class LoginController {
     this.$ionicPopup.alert({
       title: 'Login success',
       template: `
+        <div>API: ${this.appConfig.apiHost}</div>
         <div>username: ${this.username}</div>
         <div>password: ${this.password}</div>
       `,

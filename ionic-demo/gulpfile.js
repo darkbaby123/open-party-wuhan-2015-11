@@ -9,15 +9,21 @@ var sh = require('shelljs')
 var babel = require('gulp-babel')
 var sourcemaps = require('gulp-sourcemaps')
 var templateCache = require('gulp-angular-templatecache')
+var gulpNgConfig = require('gulp-ng-config')
 
 var paths = {
   js: ['./app/**/*.js'],
   sass: ['./scss/**/*.scss'],
   template: ['./app/**/*.html'],
+  appConfig: ['./config/app-config.json'],
   compiled: './www/compiled/',
 }
 
-gulp.task('default', ['js', 'sass', 'template'])
+var env = process.env.ENV || 'dev'
+
+gutil.log('Environment:', gutil.colors.green.bold(env))
+
+gulp.task('default', ['js', 'sass', 'template', 'appConfig'])
 
 gulp.task('js', function() {
   return gulp.src(paths.js)
@@ -52,10 +58,21 @@ gulp.task('template', function() {
     .pipe(gulp.dest(paths.compiled))
 })
 
+gulp.task('appConfig', function() {
+  return gulp.src(paths.appConfig)
+    .pipe(gulpNgConfig('app', {
+      createModule: false,
+      environment: env
+    }))
+    .on('error', displayBabelError)
+    .pipe(gulp.dest(paths.compiled))
+})
+
 gulp.task('watch', function() {
   gulp.watch(paths.js, ['js'])
   gulp.watch(paths.sass, ['sass'])
   gulp.watch(paths.template, ['template'])
+  gulp.watch(paths.appConfig, ['appConfig'])
 })
 
 gulp.task('install', ['git-check'], function() {
