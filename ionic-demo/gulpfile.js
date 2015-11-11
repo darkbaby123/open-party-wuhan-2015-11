@@ -10,6 +10,8 @@ var babel = require('gulp-babel')
 var sourcemaps = require('gulp-sourcemaps')
 var templateCache = require('gulp-angular-templatecache')
 var gulpNgConfig = require('gulp-ng-config')
+var runSequence = require('run-sequence')
+var del = require('del')
 
 var paths = {
   js: ['./app/**/*.js'],
@@ -23,7 +25,19 @@ var env = process.env.ENV || 'dev'
 
 gutil.log('Environment:', gutil.colors.green.bold(env))
 
-gulp.task('default', ['js', 'sass', 'template', 'appConfig'])
+gulp.task('default', ['build'])
+
+gulp.task('build', function(done) {
+  runSequence(
+    'clean',
+    ['js', 'sass', 'template', 'appConfig'],
+    done
+  )
+})
+
+gulp.task('clean', function() {
+  return del(paths.compiled)
+})
 
 gulp.task('js', function() {
   return gulp.src(paths.js)
