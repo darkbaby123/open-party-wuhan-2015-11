@@ -18,5 +18,4 @@ reveal-md .
 
 # TODO
 
-- 加上 Cordova 项目结构
 - 为 Ionic demo 写文档

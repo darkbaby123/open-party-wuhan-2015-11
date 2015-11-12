@@ -115,7 +115,50 @@
 
 ----
 
-## Ionic 项目结构 === Angular 项目结构
+## Cordova 项目结构
+
+```
+hooks/          <- Cordova 回调脚本
+platforms/      <- 编译后的 native app 代码（壳）
+  ios/          <- iOS app
+  android/      <- Android app
+plugins/        <- Cordova 插件
+www/
+  index.html    <- Webview 首页
+  ..            <- index.html 需要的其他静态资源
+config.xml      <- Cordova 项目配置
+```
+
+----
+
+## Ionic 项目结构
+
+```
+hooks/
+node_modules    <- 不用说了吧
+platforms/
+  ios/
+  android/
+plugins/
+www/
+  index.html
+  lib/          <- Bower 安装的包（bower_components）
+  ..
+.bowerrc        <- Bower 配置
+bower.json      <- Bower 包管理
+config.xml
+gulpfile.js     <- Gulp 脚本，Ionic CLI 可能会用到
+ionic.project   <- Ionic 项目配置
+package.json    <- NPM 包管理
+```
+
+----
+
+## Ionic 项目 === Angular 项目
+
+- Cordova 只关心 `www` 下面的内容，不在意它们怎么构建的
+- Ionic 就是 Gulp 构建的 Angular 项目
+- 我们可以把 web 相关代码抽出去，只要最终 build 到 `www` 就行
 
 ----
 
@@ -125,7 +168,7 @@
 - 针对 ES2015 做一点改变
 
 ```
-app/
+app/                        <- Angular 应用源码
   app.js                    <- 应用程序入口，引用所以模块
   mod-1/                    <- 按功能划分模块，内部文件名 func.type.js
     mod-1.route.js          <- 模块路由
