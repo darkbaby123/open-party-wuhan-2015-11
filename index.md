@@ -495,6 +495,7 @@ ionic run ios
 
 - iOS 可以接 Safari
 - Android 可以接 Chrome
+- 需要打开设备的 USB debug 功能
 
 ----
 
@@ -655,7 +656,7 @@ class SomeController {
     this.fullName = `${this.user.firstName} ${this.user.lastName}`
 
     // 推荐 (watch)
-    $scope.$watchGroup(['vim.user.firstName', 'vm.user.lastName'], () => {
+    $scope.$watchGroup(['vm.user.firstName', 'vm.user.lastName'], () => {
       this.fullName = `${this.user.firstName} ${this.user.lastName}`
     })
   }
@@ -695,6 +696,13 @@ class SomeController {
 - Android 平台可以替换成统一的 webview
 - 推荐 [Crosswalk](https://crosswalk-project.org/documentation/cordova/cordova_4.html)
 - 需要 Cordova 版本 4.0 以上
+
+----
+
+## 缺点
+
+- 编译后的项目会变大（包含了 Crosswalk）
+- 会编译出 x86 和 arm 两个版本
 
 ---
 
