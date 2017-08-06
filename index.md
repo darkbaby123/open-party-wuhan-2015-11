@@ -186,7 +186,7 @@ app/                        <- Angular 应用源码
 ```js
 // func-1.controller.js
 
-(() => {  // <- 简单的闭包，避免污染全局
+(() => {  // <- use IIFE to avoid polluting global
 
 class Func1Controller {
   constructor($scope) {
@@ -233,13 +233,11 @@ angular.module('app.mod-1').service('func1Service', Func1Service)
 ## 原始的方法
 
 ```html
-<!--
 <script src="app/app.js"></script>
 <script src="app/feature-1/feature-1.route.js"></script>
 <script src="app/feature-1/func-1.controller.js"></script>
 <script src="app/feature-1/func-1.service.js"></script>
 50 more script tags...
--->
 ```
 
 ----
@@ -298,23 +296,22 @@ gulp.task('sass', function() {
 
 ```
 app/
-  app.js           <- JavaScript 入口
+  app.js           <- JS entry point
   feature-1/
   feature-2/
 scss/
-  app.scss         <- SASS 入口
+  app.scss         <- SASS entry point
   ...
 www/
-  app/all.js       <- 编译后的 JavaScript
-  css/style.css    <- 编译后的 CSS
+  app/all.js       <- Compiled JS
+  css/style.css    <- Compiled CSS
   index.html
 ```
 
 ```html
-<!-- www/index.html
+<!-- www/index.html -->
 <link href="css/style.css" rel="stylesheet">
 <script src="app/all.js"></script>
--->
 ```
 
 ---
@@ -433,7 +430,8 @@ gulp.task('app-config', function() {
 ```bash
 ENV=staging gulp build
 
-ENV=prod ionic serve    <- 使用 ENV 的好处，不影响 Ionic CLI
+// Advantage to use ENV: does not affect Ionic CLI
+ENV=prod ionic serve
 ```
 
 ## 编译后的 module
@@ -514,7 +512,7 @@ ionic run ios
 ## 在设备上 Live Reload
 
 ```bash
-# 有时有点小问题，不过基本能用
+# You may met problems sometimes, but it works
 ionic run ios --livereload
 ```
 
@@ -549,7 +547,7 @@ gulp.task('build', function(done) {
   runSequence(
     'clean',
     ['js-polyfill', 'js', 'app-config', 'template', 'sass'],
-    done    // 调用 done callback，告诉 Gulp 任务何时完成
+    done    // Use done callback to tell Gulp when the task completes
   )
 })
 ```
@@ -585,8 +583,8 @@ var paths = {
   template: ['./app/**/*.html'],
 }
 
-// 预编译模板成 JavaScript，放到 app.templates 模块下
-// build 时调用这个任务
+// Precompile templates to JS under app.templates module
+// It's called in build process
 gulp.task('template', function() {
   return gulp.src(paths.template)
     .pipe(templateCache({
@@ -628,14 +626,15 @@ gulp.task('template', function() {
 ```js
 class SomeController {
   constructor($scope) {
-    // 当 view 重新构造时才执行，缓存后就不执行了
+    // Executed when view is re-constructored
+    // Cache view does not execute it
 
     $scope.$on('$ionicView.beforeEnter', () => {
-      // 每次进入 view 的时候都会执行
+      // Executed every time when entering view
     })
 
     $scope.$on('$ionicView.beforeLeave', () => {
-      // 每次离开 view 的时候都会执行
+      // Executed every time when leaving view
     })
   }
 }
@@ -652,16 +651,16 @@ class SomeController {
   constructor($scope, user) {
     this.user = user
 
-    // 不推荐
+    // not recommended
     this.fullName = `${this.user.firstName} ${this.user.lastName}`
 
-    // 推荐 (watch)
+    // less recommended (watch)
     $scope.$watchGroup(['vm.user.firstName', 'vm.user.lastName'], () => {
       this.fullName = `${this.user.firstName} ${this.user.lastName}`
     })
   }
 
-  // 大力推荐 (getter)
+  // recommended (getter)
   get fullName() {
     return `${this.user.firstName} ${this.user.lastName}`
   }
